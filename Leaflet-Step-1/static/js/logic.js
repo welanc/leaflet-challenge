@@ -14,8 +14,10 @@ function createFeatures(earthquakeData) {
     function createCircleMarker(feature, latlng) {
         let options = {
             radius: feature.properties.mag * 9000,
-            fillColor: "lightgreen",
-            opacity: 0,
+            fillColor: perc2color(feature.properties.mag, minMag, maxMag),
+            weight: 0.5,
+            color: "black",
+            opacity: 0.5,
             fillOpacity: 0.5
         }
         return L.circle(latlng, options);
@@ -27,27 +29,41 @@ function createFeatures(earthquakeData) {
     };
 
     // Retrieve all locations in JSON and store in variable
-    var locations = Array();
-    var coords = Array();
     var magnitude = Array();
-
-    earthquakeData.forEach(data => {
-        locations.push(data.properties.place);
-    });
-
-    earthquakeData.forEach(data => {
-        coords.push([data.geometry.coordinates[1],
-        data.geometry.coordinates[0]]);
-    });
 
     earthquakeData.forEach(data => {
         magnitude.push(data.properties.mag);
     });
 
+    var minMag = Math.min(...magnitude);
+    var maxMag = Math.max(...magnitude);
+
+    ////////////////////////////////////////////////////////////////////
+    // Colour gradient retrieved on 02 April 2021 by mlocati & roboriaan
+    // @ https://gist.github.com/mlocati/7210513
+    function perc2color(perc, min, max) {
+        var base = (max - min);
+
+        if (base == 0) { perc = 100; }
+        else {
+            perc = (perc - min) / base * 100;
+        }
+        var r, g, b = 0;
+        if (perc < 50) {
+            r = 255;
+            g = Math.round(5.1 * perc);
+        }
+        else {
+            g = 255;
+            r = Math.round(510 - 5.10 * perc);
+        }
+        var h = r * 0x10000 + g * 0x100 + b * 0x1;
+        return '#' + ('000000' + h.toString(16)).slice(-6);
+    };
+    ////////////////////////////////////////////////////////////////////
+
     // Log to confirm locations retrieved
-    console.log(locations);
-    console.log(coords);
-    console.log(magnitude);
+    // console.log(magnitude);
 
     // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
@@ -95,7 +111,7 @@ function createMap(earthquakes) {
         center: [
             37.09, -95.71
         ],
-        zoom: 2,
+        zoom: 3,
         layers: [streetmap, earthquakes]
     });
 
