@@ -7,11 +7,7 @@ d3.json(earthquakeUrl, function (data) {
     createFeatures(data.features);
 });
 
-// Perform a GET request to the query URL
-d3.json(tectonicUrl, function (data) {
-    // Once we get a response, send the data.features object to the createFeatures function
-    createTectonics(data.features);
-});
+
 
 
 // Create Earthquake data for mapping
@@ -23,10 +19,8 @@ function createFeatures(earthquakeData) {
         let options = {
             radius: feature.properties.mag * 9000,
             fillColor: earthquakeColour(feature.properties.mag),
-            weight: 0.5,
-            color: "black",
-            opacity: 0.5,
-            fillOpacity: 0.5
+            opacity: 0,
+            fillOpacity: 1
         }
         return L.circle(latlng, options);
     }
@@ -79,6 +73,17 @@ function createFeatures(earthquakeData) {
         onEachFeature: onEachFeature
     });
 
+    // // Perform a GET request to the query URL
+    // d3.json(tectonicUrl, function (data) {
+    //     // Once we get a response, send the data.features object to the createFeatures function
+    //     var tectonics = L.polyline(data.geometry.coordinates[0]);
+    // });
+
+    // var tectonics = d3.json(tectonicUrl, function (data) {
+    //     // Once we get a response, send the data.features object to the createFeatures function
+    //     L.polyline(data.geometry.coordinates[0]);
+    // });
+
     // Sending our earthquakes layer to the createMap function
     createMap(earthquakes);
 }
@@ -112,9 +117,6 @@ function createLegend() {
     };
 };
 
-function createTectonics(tectonicData) {
-
-};
 
 // Create map using earthquake data and tectonic plates data
 function createMap(earthquakes) {
@@ -146,7 +148,19 @@ function createMap(earthquakes) {
 
     // Create overlay object to hold our overlay layer
     var overlayMaps = {
-        Earthquakes: earthquakes
+        Earthquakes: earthquakes,
+        // FaultLines: tectonics
+    };
+
+    // Create a legend to display information about our map
+    var info = L.control({
+        position: "bottomright"
+    });
+
+    // When the layer control is added, insert a div with the class of "legend"
+    info.onAdd = function () {
+        var div = L.DomUtil.create("div", "legend");
+        return div;
     };
 
     // Create the map, giving it the light map 
