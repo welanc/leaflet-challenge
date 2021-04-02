@@ -14,7 +14,7 @@ function createFeatures(earthquakeData) {
     function createCircleMarker(feature, latlng) {
         let options = {
             radius: feature.properties.mag * 9000,
-            fillColor: perc2color(feature.properties.mag, minMag, maxMag),
+            fillColor: perc2Color(feature.properties.mag, minMag, maxMag),
             weight: 0.5,
             color: "black",
             opacity: 0.5,
@@ -41,7 +41,7 @@ function createFeatures(earthquakeData) {
     ////////////////////////////////////////////////////////////////////
     // Colour gradient retrieved on 02 April 2021 by mlocati & roboriaan
     // @ https://gist.github.com/mlocati/7210513
-    function perc2color(perc, min, max) {
+    function perc2Color(perc, min, max) {
         var base = (max - min);
 
         if (base == 0) { perc = 100; }
@@ -50,12 +50,12 @@ function createFeatures(earthquakeData) {
         }
         var r, g, b = 0;
         if (perc < 50) {
-            r = 255;
-            g = Math.round(5.1 * perc);
+            g = 255;
+            r = Math.round(5.1 * perc);
         }
         else {
-            g = 255;
-            r = Math.round(510 - 5.10 * perc);
+            r = 255;
+            g = Math.round(510 - 5.1 * perc);
         }
         var h = r * 0x10000 + g * 0x100 + b * 0x1;
         return '#' + ('000000' + h.toString(16)).slice(-6);
