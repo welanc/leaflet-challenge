@@ -4,20 +4,55 @@ var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_we
 d3.json(queryUrl, function (data) {
     // Once we get a response, send the data.features object to the createFeatures function
     createFeatures(data.features);
+
 });
 
 function createFeatures(earthquakeData) {
 
     // Define a function we want to run once for each feature in the features array
     // Give each feature a popup describing the place and time of the earthquake
+    function createCircleMarker(feature, latlng) {
+        let options = {
+            radius: feature.properties.mag * 9000,
+            fillColor: "lightgreen",
+            opacity: 0,
+            fillOpacity: 0.5
+        }
+        return L.circle(latlng, options);
+    }
+
     function onEachFeature(feature, layer) {
         layer.bindPopup("<h3>" + feature.properties.place +
-            "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
-    }
+            "</h3><hr><p>" + new Date(feature.properties.time) + "<p>" + "Magnitude: " + feature.properties.mag + "</p>");
+    };
+
+    // Retrieve all locations in JSON and store in variable
+    var locations = Array();
+    var coords = Array();
+    var magnitude = Array();
+
+    earthquakeData.forEach(data => {
+        locations.push(data.properties.place);
+    });
+
+    earthquakeData.forEach(data => {
+        coords.push([data.geometry.coordinates[1],
+        data.geometry.coordinates[0]]);
+    });
+
+    earthquakeData.forEach(data => {
+        magnitude.push(data.properties.mag);
+    });
+
+    // Log to confirm locations retrieved
+    console.log(locations);
+    console.log(coords);
+    console.log(magnitude);
 
     // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
     var earthquakes = L.geoJSON(earthquakeData, {
+        pointToLayer: createCircleMarker,
         onEachFeature: onEachFeature
     });
 
@@ -60,7 +95,7 @@ function createMap(earthquakes) {
         center: [
             37.09, -95.71
         ],
-        zoom: 5,
+        zoom: 2,
         layers: [streetmap, earthquakes]
     });
 
