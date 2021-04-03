@@ -7,86 +7,107 @@ d3.json(earthquakeUrl, function (data) {
     createFeatures(data.features);
 });
 
+// d3.json(tectonicUrl, function (data) {
+//     // Once we get a response, send the data.features object to the createFeatures function
+//     createTectonics(data.features);
+// });
 
+// function createTectonics(tectonicData) {
+//     var faultLines = Array();
 
+//     for (var i = 0; i < tectonicData.length; i++) {
+//         faultLines.push(tectonicData[i].geometry.coordinates);
+//     };
+
+//     console.log(faultLines);
+
+//     var tectonics = L.polyline(faultLines, { color: "orange" })
+
+//     createMap(tectonics);
+// };
 
 // Create Earthquake data for mapping
 function createFeatures(earthquakeData) {
-
-    // Define a function we want to run once for each feature in the features array
-    // Give each feature a popup describing the place and time of the earthquake
-    function createCircleMarker(feature, latlng) {
-        let options = {
-            radius: feature.properties.mag * 9000,
-            fillColor: earthquakeColour(feature.properties.mag),
-            opacity: 0,
-            fillOpacity: 1
+    d3.json(tectonicUrl, function (tectonicData) {
+        // Define a function we want to run once for each feature in the features array
+        // Give each feature a popup describing the place and time of the earthquake
+        function createCircleMarker(feature, latlng) {
+            let options = {
+                radius: feature.properties.mag * 9000,
+                fillColor: earthquakeColour(feature.properties.mag),
+                opacity: 0,
+                fillOpacity: 1
+            }
+            return L.circle(latlng, options);
         }
-        return L.circle(latlng, options);
-    }
 
-    function onEachFeature(feature, layer) {
-        layer.bindPopup("<h3>" + feature.properties.place +
-            "</h3><hr><p>" + new Date(feature.properties.time) + "<p>" + "Magnitude: " + feature.properties.mag + "</p>");
-    };
+        function onEachFeature(feature, layer) {
+            layer.bindPopup("<h3>" + feature.properties.place +
+                "</h3><hr><p>" + new Date(feature.properties.time) + "<p>" + "Magnitude: " + feature.properties.mag + "</p>");
+        };
 
-    // Retrieve all locations in JSON and store in variable
-    var magnitude = Array();
+        // Retrieve all locations in JSON and store in variable
+        var magnitude = Array();
 
-    earthquakeData.forEach(data => {
-        magnitude.push(data.properties.mag);
+        earthquakeData.forEach(data => {
+            magnitude.push(data.properties.mag);
+        });
+
+        // Loop through the magnitude array and 
+        // assign a colour
+        function earthquakeColour(data) {
+
+            // Conditionals for magnitude
+            if (data < 1.0) {
+                color = "#b7f24c";
+            }
+            else if ((data >= 1.0) && (data < 2.0)) {
+                color = "#e0f24d";
+            }
+            else if ((data >= 2.0) && (data < 3.0)) {
+                color = "#f2db4c";
+            }
+            else if ((data >= 3.0) && (data < 4.0)) {
+                color = "#f3ba4d";
+            }
+            else if ((data >= 4.0) && (data < 5.0)) {
+                color = "#f0a76b";
+            }
+            else {
+                color = "#f06b6b";
+            }
+            return color;
+        }
+
+        // Log to confirm locations retrieved
+        console.log(magnitude);
+
+        // Create a GeoJSON layer containing the features array on the earthquakeData object
+        // Run the onEachFeature function once for each piece of data in the array
+        var earthquakes = L.geoJSON(earthquakeData, {
+            pointToLayer: createCircleMarker,
+            onEachFeature: onEachFeature
+        });
+
+
+        var faultLines = Array();
+        var tectonicFeatures = tectonicData.features;
+        for (var i = 0; i < tectonicFeatures.length; i++) {
+            faultLines.push(tectonicFeatures[i].geometry.coordinates);
+        };
+
+        console.log(faultLines);
+
+        var tectonics = L.polyline(faultLines, { color: "orange" })
+
+
+        // Sending our earthquakes layer to the createMap function
+        createMap(earthquakes, tectonics);
     });
 
-    // Loop through the magnitude array and 
-    // assign a colour
-    function earthquakeColour(data) {
 
-        // Conditionals for magnitude
-        if (data < 1.0) {
-            color = "#b7f24c";
-        }
-        else if ((data >= 1.0) && (data < 2.0)) {
-            color = "#e0f24d";
-        }
-        else if ((data >= 2.0) && (data < 3.0)) {
-            color = "#f2db4c";
-        }
-        else if ((data >= 3.0) && (data < 4.0)) {
-            color = "#f3ba4d";
-        }
-        else if ((data >= 4.0) && (data < 5.0)) {
-            color = "#f0a76b";
-        }
-        else {
-            color = "#f06b6b";
-        }
-        return color;
-    }
-
-    // Log to confirm locations retrieved
-    // console.log(magnitude);
-
-    // Create a GeoJSON layer containing the features array on the earthquakeData object
-    // Run the onEachFeature function once for each piece of data in the array
-    var earthquakes = L.geoJSON(earthquakeData, {
-        pointToLayer: createCircleMarker,
-        onEachFeature: onEachFeature
-    });
-
-    // // Perform a GET request to the query URL
-    // d3.json(tectonicUrl, function (data) {
-    //     // Once we get a response, send the data.features object to the createFeatures function
-    //     var tectonics = L.polyline(data.geometry.coordinates[0]);
-    // });
-
-    // var tectonics = d3.json(tectonicUrl, function (data) {
-    //     // Once we get a response, send the data.features object to the createFeatures function
-    //     L.polyline(data.geometry.coordinates[0]);
-    // });
-
-    // Sending our earthquakes layer to the createMap function
-    createMap(earthquakes);
 }
+
 
 // Create map legend
 function createLegend() {
@@ -119,7 +140,7 @@ function createLegend() {
 
 
 // Create map using earthquake data and tectonic plates data
-function createMap(earthquakes) {
+function createMap(tectonics) {
 
     // Define light map
     var satelliteMap = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', {
@@ -146,10 +167,14 @@ function createMap(earthquakes) {
         "Outdoors": outdoorsMap
     };
 
-    // Create overlay object to hold our overlay layer
-    var overlayMaps = {
+    var layers = {
         Earthquakes: earthquakes,
-        // FaultLines: tectonics
+        faultLines: tectonics
+    }
+    // Create overlay object to hold our overlay layer
+    var ovarlayMaps = {
+        "Earthquakes": layers.Earthquakes,
+        "Fault Lines": layers.faultLines
     };
 
     // Create a legend to display information about our map
@@ -170,7 +195,7 @@ function createMap(earthquakes) {
             37.09, -95.71
         ],
         zoom: 3,
-        layers: [satelliteMap, earthquakes]
+        layers: [satelliteMap, layers.faultLines]
     });
 
     L.control.layers(baseMaps, overlayMaps, {
