@@ -28,7 +28,7 @@ d3.json(earthquakeUrl, function (data) {
 
 // Create Earthquake data for mapping
 function createFeatures(earthquakeData) {
-    d3.json(tectonicUrl, function (jsonPromise) {
+    d3.json(tectonicUrl, function (tectonicData) {
         // Loop through the magnitude array and assign a colour
         function earthquakeColour(data) {
 
@@ -78,14 +78,22 @@ function createFeatures(earthquakeData) {
             pointToLayer: createCircleMarker,
             onEachFeature: onEachFeature
         });
-        var faultLines = Array();
-        var tectonicData = jsonPromise.features;
-        for (var i = 0; i < tectonicData.length; i++) {
-            faultLines.push(tectonicData[i].geometry.coordinates);
-        };
 
-        console.log(faultLines);
-        var tectonics = L.polyline(faultLines, { color: "orange" })
+        // // Assign variables for tectonic plates
+        // var faultLines = Array();
+        // var tectonicData = jsonPromise.features;
+
+        // // Loop through geoJSON of tectonic data to extract only coordinates and push to array
+        // for (var i = 0; i < tectonicData.length; i++) {
+        //     faultLines.push(tectonicData[i].geometry.coordinates);
+        // };
+
+        // console.log(faultLines);
+        var tectonics = L.geoJSON(tectonicData, {
+            style: function () {
+                return { color: "orange" };
+            }
+        });
 
         // Sending our earthquakes layer to the createMap function
         createMap(earthquakes, tectonics);
@@ -177,7 +185,7 @@ function createMap(earthquakes, tectonics) {
     // and earthquakes layers to display on load
     var myMap = L.map("map", {
         center: [
-            37.09, -95.71
+            5.354095, 20.376243
         ],
         zoom: 3,
         layers: [satelliteMap, layers.Earthquakes, layers.faultLines]
