@@ -14,19 +14,19 @@ function createFeatures(earthquakeData) {
         function earthquakeColour(data) {
 
             // Conditionals for magnitude
-            if (data < 1.0) {
+            if (data <= 1.0) {
                 color = "#b7f24c";
             }
-            else if ((data >= 1.0) && (data < 2.0)) {
+            else if ((data > 1.0) && (data <= 2.0)) {
                 color = "#e0f24d";
             }
-            else if ((data >= 2.0) && (data < 3.0)) {
+            else if ((data > 2.0) && (data <= 3.0)) {
                 color = "#f2db4c";
             }
-            else if ((data >= 3.0) && (data < 4.0)) {
+            else if ((data > 3.0) && (data <= 4.0)) {
                 color = "#f3ba4d";
             }
-            else if ((data >= 4.0) && (data < 5.0)) {
+            else if ((data > 4.0) && (data <= 5.0)) {
                 color = "#f0a76b";
             }
             else {
