@@ -7,25 +7,6 @@ d3.json(earthquakeUrl, function (data) {
     createFeatures(data.features);
 });
 
-// d3.json(tectonicUrl, function (data) {
-//     // Once we get a response, send the data.features object to the createFeatures function
-//     createTectonics(data.features);
-// });
-
-// function createTectonics(tectonicData) {
-//     var faultLines = Array();
-
-//     for (var i = 0; i < tectonicData.length; i++) {
-//         faultLines.push(tectonicData[i].geometry.coordinates);
-//     };
-
-//     console.log(faultLines);
-
-//     var tectonics = L.polyline(faultLines, { color: "orange" })
-
-//     createMap(tectonics);
-// };
-
 // Create Earthquake data for mapping
 function createFeatures(earthquakeData) {
     d3.json(tectonicUrl, function (tectonicData) {
@@ -78,15 +59,6 @@ function createFeatures(earthquakeData) {
             pointToLayer: createCircleMarker,
             onEachFeature: onEachFeature
         });
-
-        // // Assign variables for tectonic plates
-        // var faultLines = Array();
-        // var tectonicData = jsonPromise.features;
-
-        // // Loop through geoJSON of tectonic data to extract only coordinates and push to array
-        // for (var i = 0; i < tectonicData.length; i++) {
-        //     faultLines.push(tectonicData[i].geometry.coordinates);
-        // };
 
         // console.log(faultLines);
         var tectonics = L.geoJSON(tectonicData, {

@@ -4,7 +4,6 @@ var earthquakeUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/a
 d3.json(earthquakeUrl, function (data) {
     // Once we get a response, send the data.features object to the createFeatures function
     createFeatures(data.features);
-
 });
 
 function createFeatures(earthquakeData) {
@@ -61,35 +60,8 @@ function createFeatures(earthquakeData) {
         return color;
     }
 
-    // var minMag = Math.min(...magnitude);
-    // var maxMag = Math.max(...magnitude);
-
-    ////////////////////////////////////////////////////////////////////
-    // Colour gradient retrieved on 02 April 2021 by mlocati & roboriaan
-    // @ https://gist.github.com/mlocati/7210513
-    // function perc2Color(perc, min, max) {
-    //     var base = (max - min);
-
-    //     if (base == 0) { perc = 100; }
-    //     else {
-    //         perc = (perc - min) / base * 100;
-    //     }
-    //     var r, g, b = 0;
-    //     if (perc < 50) {
-    //         g = 255;
-    //         r = Math.round(5.1 * perc);
-    //     }
-    //     else {
-    //         r = 255;
-    //         g = Math.round(510 - 5.1 * perc);
-    //     }
-    //     var h = r * 0x10000 + g * 0x100 + b * 0x1;
-    //     return '#' + ('000000' + h.toString(16)).slice(-6);
-    // };
-    ////////////////////////////////////////////////////////////////////
-
     // Log to confirm locations retrieved
-    // console.log(magnitude);
+    console.log(magnitude);
 
     // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
@@ -168,4 +140,3 @@ function createMap(earthquakes) {
     // Call map legend function
     createLegend();
 }
-
